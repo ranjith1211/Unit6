@@ -1,0 +1,195 @@
+1.) Give an example where call apply bind is. required?
+A.) All javascript functions have access to some very special methods which we can use to control where `this` should refer. Such methods are `call()`, `apply()`, `bind()`
+
+What if you want to access a method of one object onto another?
+Remember, 'this' denotes owner object. If we change where 'this' points, we can change owner object, allowing us to access a value of a different object.
+
+Call() :
+call() provides a new value of this to the function/method
+
+How to access Method of another object
+
+- Its like a person in bedroom wants to access a dish from kitchen without going to kitchen, well only a superpower can make it happen.
+- similarly, there is no normal way in Js for us to access Method of another object
+- we need a superpower and that is 'call' method.
+
+Apply() : 
+The apply() method is literally same as call() method. They just take arguments seperately.
+Ex : call() take individual arguments seperated by comma i.e; printBio.call(obj,20,'Pune')
+     apply() takes a single array of arguments i.e; printBio.apply(obj,[20,'Pune'])
+
+Bind() : 
+Bind works the same as the call and apply works, only the difference is that it will bind the particular object as 'this' to a function and use it when ever its required.
+we cannot use call() and apply() later, they run immediately.
+
+All `Call`, `Apply` and `Bind` do the exact same thing. 
+The only difference is Apply takes only one argument as an array while bind doesnt executes itself right away, it just binds the new 'this' value.
+
+Ex :- 
+
+function Person(n, a) {
+  this.name = n;
+  this.age = a;
+}
+
+function Teacher(s, n, a) {
+  Person.call(this, n, a);
+  this.subject = s;
+}
+
+function Student(s, n, a) {
+  Person.apply(this, [n, a]);
+  this.subject = s;
+}
+
+function Player(s, n, a) {
+  var x = Person.bind(this, n, a);
+  x();
+  this.sport = s;
+}
+
+var teacher1 = new Teacher("Physics", "Rahul", 26);
+var player1 = new Player("Cricket", "Virat", 30);
+var student1 = new Student("Js", "Tushar", 19);
+console.log("student1:", student1);  // Student { name: 'Tushar', age: 19, subject: 'Js' }
+console.log("player1 : ", player1);  // Player { name: 'Virat', age: 30, sport: 'Cricket' }
+console.log("teacher1 : ", teacher1); // Teacher { name: 'Rahul', age: 26, subject: 'Physics' }
+
+2.) What is the difference between readFile and readFileSync?
+A.) The fs.readFileSync() method is an inbuilt application programming interface of fs module which is used to read the file and return its content. 
+In fs.readFile() method, we can read a file in a non-blocking asynchronous way, but in fs.readFileSync() method, we can read files in a synchronous way, i.e. we are telling node.js to block other parallel process and do the current file reading process. 
+That is, when the fs.readFileSync() method is called the original node program stops executing, and node waits for the fs.readFileSync() function to get executed, after getting the result of the method the remaining node program is executed.
+
+syntax: fs.readFileSync( path, options )
+- path: It takes the relative path of the text file. The path can be of URL type. The file can also be a file descriptor. If both the files are in the same folder just give the filename in quotes.
+- options: It is an optional parameter which contains the encoding and flag, the encoding contains data specification. It’s default value is null which returns raw buffer and the flag contains indication of operations in the file. It’s default value is ‘r’.
+Return Value: This method returns the content of the file.
+Ex :-  input1.txt = (1) This is some text data which is stored in input1.txt file.
+       input2.txt = (2) This is some text data which is stored in input2.txt file.
+
+const fs = require('fs');
+
+fs.readFile('./input1.txt',
+		{encoding:'utf8', flag:'r'},
+		function(err, data) {
+	if(err)
+		console.log(err);
+	else
+		console.log(data);
+});
+
+
+const data = fs.readFileSync('./input2.txt',
+			{encoding:'utf8', flag:'r'});
+
+console.log(data);
+
+output : (2) This is some text data which is stored in input2.txt file.
+         (1) This is some text data which is stored in input1.txt file.
+Observation: We can observe that when we are calling the fs.readFile() method which reads ‘input1.txt’ and after that we are calling the fs.readFileSync() method which reads the ‘input2.txt’ file, but seeing the output we find that ‘input2.txt’ file is readed first then ‘input1.txt’ file, 
+this happens because when the compiler compiles the node.js file it first calls the fs.readFile() method which reads a file, but parallelly it continues to compile the remaining program too, after that it calls the fs.readFileSync() method which reads another file,
+when calling the readFileSync() method the compiler stops other parallel process (which is here reading the ‘input1.txt’ file from readFile() method) and continues the ongoing process to it’s end, whenever the ongoing process ends the compiler resumes the remaining process that’s why we observe that the contents of ‘input2.txt’ is printed first rather than ‘input1.txt’.
+So, we can use fs.readFileSync() method for tasks like pausing other parallel processes and read a file synchronously.
+
+3.) What does process in node.js mean?
+A.) Each program running on a computer represents a process. It's a top level task that an operating system such as Windows or Linux uses to encapsulate a running program. Among other things, a process contains:
+
+- Code that is running
+- Memory that is allocated to it by the OS
+- Files or sockets that it has open
+- One or more threads running within the process
+When a process exits (or crashes), the operating system automatically cleans up resources owned by that process (closes files/sockets, returns memory back to the OS, shuts-down threads, etc...).
+The term process is an operating system term and not a node.js term. 
+The process module in node.js is a central place where the designers of node.js put a bunch of methods that relate to the overall process such as process.exit() which exits the application and thus stops the process or 
+process.env which gives you access to the environment variables for your program or process.argv which gives you access to the command line arguments your process was started with and so on... 
+These are all things that apply to your overall program running.
+
+4.) Explain what node.js is?
+A.) Node.js is a single-threaded, open-source, cross-platform runtime environment for building fast and scalable server-side and networking applications. 
+It runs on the V8 JavaScript runtime engine, and it uses event-driven, non-blocking I/O architecture, which makes it efficient and suitable for real-time applications.
+Node.js uses the “Single Threaded Event Loop” architecture to handle multiple clients at the same time. 
+
+Node.js works differently. Let’s take a look at each step it goes through:
+
+Node.js maintains a limited thread pool to serve requests.
+Whenever a request comes, Node.js places it into a queue.
+Now, the single-threaded “Event loop”—the core component—comes into the picture. This event loop waits for requests indefinitely.
+When a request comes in, the loop picks it up from the queue and checks whether it requires a blocking input/output (I/O) operation. If not, it processes the request and sends a response.
+If the request has a blocking operation to perform, the event loop assigns a thread from the internal thread pool to process the request. There are limited internal threads available. This group of auxiliary threads is called the worker group.
+The event loop tracks blocking requests and places them in the queue once the blocking task is processed. This is how it maintains its non-blocking nature.
+
+5.) What is the difference of JS from browser to JS on node.js
+A.) 
+- JavaScript is a programming language. It is running in any web browser with a proper browser engine.
+Whereas NodeJs is an interpreter and environment for JavaScript with some specific useful libraries which JavaScript programming can use separately.
+- JavaScript is used for any client-side activity for a web application, like possible attribute validation or refreshing the page in a specific interval or provide some dynamic changes in web pages without refreshing the page.
+Whereas NodeJs mainly used for accessing or performing any non-blocking operation of any operating system, like creating or executing a shell script or accessing any hardware-specific information or running any backend job.
+- JavaScript is normally following Java Programming language standard. There may have some different way of writing code, but at the same time, we can say it following the Java Programming language standard. 
+Whereas node JS is written in C++ and provides a V8 engine base browser javascript running engine, it helps us run a written javascript program in any browser environment.
+- JavaScript runs on any engine like Spider monkey (FireFox), JavaScript Core (Safari), V8 (Google Chrome).
+Node JS only run in a V8 engine which mainly used by google chrome. And javascript program which will be written under this Node JS will be always run in V8 Engine.
+
+6.) Write three different ways to reverse a string in Javascript? 
+a. using inbuilt method, b. iteratively, c. recursively
+
+a.) Using inbuilt method :- 
+
+let str = 'hello';
+console.log(str.split("").reverse().join(""))
+
+b.) iteratively :-
+
+let str = 'hello';
+let ans = '';
+for(let i=str.length-1;i>=0;i--){
+ ans += str[i];
+}
+console.log(ans)
+
+c.) recursively :-
+
+let str = 'hello';
+
+const reverseStr = (str) =>{
+    return (str === '') ? '' : reverseStr(str.substr(1)) + str.charAt(0);
+}
+var ans=reverseStr(str);
+console.log('ans:', ans)
+
+7.) Write a program to check two objects are equal ( deep equal )
+A.) 
+function deepEqual(object1, object2) {
+  const keys1 = Object.keys(object1);
+  const keys2 = Object.keys(object2);
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+  for (const key of keys1) {
+    const val1 = object1[key];
+    const val2 = object2[key];
+    const areObjects = isObject(val1) && isObject(val2);
+    if (
+      (areObjects && !deepEqual(val1, val2)) ||
+      (!areObjects && val1 !== val2)
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+function isObject(object) {
+  return object != null && typeof object === "object";
+}
+
+console.log(deepEqual(hero1, hero2));
+
+8.) What is shallow equal?
+A.) Shallow equality is verified by iterating on the keys of the objects being compared 
+and returning true when the values of a key in each object are strictly equal for all the keys.
+If the properties' values of objects to compare are primitive values, the shallow equality check is the way to go.
+But objects in JavaScript can be nested. In such a case, unfortunately, the shallow equality doesn't work well.
+
+
+
+
+Video Link : https://drive.google.com/file/d/1EBkm8Z1c0ia6hR1JU3X8jscSbQgnt07I/view?usp=sharing
